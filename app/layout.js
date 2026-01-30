@@ -12,19 +12,22 @@ export const metadata = {
 
 import { AuthProvider } from "@/contexts/AuthContext";
 import I18nProvider from "@/components/I18nProvider";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={`${outfit.variable} ${inter.variable} font-sans antialiased bg-slate-50 text-slate-900`}>
-        <I18nProvider>
-          <AuthProvider>
-            <Navigation />
-            <main className="pt-20 min-h-screen bg-slate-50/50">
-              {children}
-            </main>
-          </AuthProvider>
-        </I18nProvider>
+        <ErrorBoundary>
+          <I18nProvider>
+            <AuthProvider>
+              <Navigation />
+              <main className="pt-20 min-h-screen bg-slate-50/50">
+                {children}
+              </main>
+            </AuthProvider>
+          </I18nProvider>
+        </ErrorBoundary>
       </body>
     </html>
   );

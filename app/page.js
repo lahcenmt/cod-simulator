@@ -12,6 +12,7 @@ import Link from "next/link";
 import { TrendingUp, LayoutDashboard, Calculator, Activity, ChevronRight, Download, Save, Menu, ArrowRightLeft } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { saveSimulation as saveToCloud } from "@/lib/firebase";
+import { useDebouncedEffect, storage } from "@/lib/hooks";
 
 import LandingPage from "@/components/LandingPage";
 
@@ -36,7 +37,7 @@ export default function Home() {
         <h2 className="text-xl font-bold text-red-600 mb-2">Scenario Error</h2>
         <button
           onClick={() => {
-            localStorage.removeItem('codsim_scenarios');
+            storage.remove('codsim_scenarios');
             window.location.reload();
           }}
           className="px-4 py-2 bg-indigo-600 text-white rounded-lg"
@@ -49,31 +50,27 @@ export default function Home() {
 
   const inputs = activeScenario.inputs || MARKETS["MA"].defaults;
 
-  // Persistence (Extract to effect to avoid conditional hook execution issues, but hooks must be top level)
-  // We MUST keep all hooks at top level.
-
+  // Load from localStorage on mount
   useEffect(() => {
-    // Only load from local storage if we are on client
-    const saved = localStorage.getItem('codsim_scenarios');
-    // ...
-    if (saved) {
+    const saved = storage.get('codsim_scenarios');
+    if (saved && Array.isArray(saved) && saved.length > 0) {
       try {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          const hydratedScenarios = parsed.map(s => ({
-            ...s,
-            inputs: { ...MARKETS[activeMarketId].defaults, ...s.inputs }
-          }));
-          setScenarios(hydratedScenarios);
-          setActiveScenarioId(hydratedScenarios[0].id);
-        }
-      } catch (e) { console.error(e); }
+        const hydratedScenarios = saved.map(s => ({
+          ...s,
+          inputs: { ...MARKETS[activeMarketId].defaults, ...s.inputs }
+        }));
+        setScenarios(hydratedScenarios);
+        setActiveScenarioId(hydratedScenarios[0].id);
+      } catch (e) {
+        console.error('Error loading scenarios:', e);
+      }
     }
-  }, []);
+  }, []); // Only run on mount
 
-  useEffect(() => {
-    localStorage.setItem('codsim_scenarios', JSON.stringify(scenarios));
-  }, [scenarios]);
+  // Debounced save to localStorage (500ms delay)
+  useDebouncedEffect(() => {
+    storage.set('codsim_scenarios', scenarios);
+  }, 500, [scenarios]);
 
   // Actions
   const updateScenario = (id, updates) => {
