@@ -7,8 +7,9 @@ import { MARKETS } from "@/lib/constants";
 import { getHistory, deleteHistoryItem } from "@/lib/historyManager";
 import { useAuth } from "@/contexts/AuthContext";
 import { getSimulations, deleteSimulation } from "@/lib/firebase";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
-export default function HistoryPage() {
+function HistoryPageContent() {
     const [history, setHistory] = useState([]);
     const { currentUser } = useAuth();
 
@@ -79,5 +80,13 @@ export default function HistoryPage() {
                 />
             </div>
         </div>
+    );
+}
+
+export default function HistoryPage() {
+    return (
+        <ProtectedRoute>
+            <HistoryPageContent />
+        </ProtectedRoute>
     );
 }

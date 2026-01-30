@@ -4,8 +4,9 @@
 import { useState, useEffect } from "react";
 import ComparisonView from "@/components/ComparisonView";
 import { MARKETS } from "@/lib/constants";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
-export default function ComparePage() {
+function ComparePageContent() {
     // We re-use local storage scenarios
     const [scenarios, setScenarios] = useState([
         { id: 'baseline', name: 'Baseline', inputs: MARKETS["MA"].defaults, isBaseline: true }
@@ -81,5 +82,13 @@ export default function ComparePage() {
                 activeMarketId={activeMarketId}
             />
         </div>
+    );
+}
+
+export default function ComparePage() {
+    return (
+        <ProtectedRoute>
+            <ComparePageContent />
+        </ProtectedRoute>
     );
 }
