@@ -1,0 +1,78 @@
+{
+    "common": {
+        "save": "Save",
+        "cancel": "Cancel",
+        "loading": "Loading..."
+    },
+    "nav": {
+        "simulator": "Simulator",
+        "compare": "Compare",
+        "history": "History",
+        "budget": "Budget",
+        "analytics": "Analytics",
+        "signIn": "Sign In",
+        "signUp": "Sign Up",
+        "signOut": "Sign Out",
+        "profile": "Profile"
+    },
+    "landing": {
+        "hero": {
+            "badge": "V.1.0 Now Live",
+            "title": "Master Your COD",
+            "titleHighlight": "E-commerce Profits",
+            "subtitle": "Stop guessing. Start scaling. The ultimate simulator for Cash on Delivery businesses to plan budgets, analyze funnels, and predict ROI with precision.",
+            "ctaPrimary": "Start Free Trial",
+            "ctaSecondary": "Try Demo"
+        },
+        "features": {
+            "title": "Everything You Need to Scale",
+            "subtitle": "From ad spend specific to GCC/Africa markets to detailed funnel leakage analysis.",
+            "calculator": {
+                "title": "Advanced Calculator",
+                "desc": "Input your COGS, shipping, and ad spend to see real-time Net Profit and ROI projections."
+            },
+            "funnel": {
+                "title": "Funnel Analytics",
+                "desc": "Visualize where you lose money. Track Lead → Confirm → Deliver drop-off points effortlessly."
+            },
+            "budget": {
+                "title": "Budget Planner",
+                "desc": "AI-driven suggestions on how to allocate your daily budget for testing vs scaling phases."
+            }
+        },
+        "pricing": {
+            "title": "Simple, Transparent Pricing",
+            "subtitle": "Choose the plan that fits your growth stage. Upgrade anytime.",
+            "free": {
+                "name": "Starter",
+                "price": "Free",
+                "desc": "Forever free for beginners.",
+                "cta": "Get Started",
+                "features": [
+                    "10 Simulations / month",
+                    "Basic Profit Calculator",
+                    "Local Storage Only",
+                    "No Cloud Sync"
+                ]
+            },
+            "pro": {
+                "name": "Pro Scale",
+                "price": "$1",
+                "period": "/month",
+                "desc": "Unleash full power.",
+                "badge": "Most Popular",
+                "cta": "Upgrade Now",
+                "features": [
+                    "Unlimited Simulations",
+                    "Cloud Save & Sync",
+                    "Advanced Funnel Analysis",
+                    "Priority Support"
+                ]
+            }
+        },
+        "footer": {
+            "tagline": "Built for dropshippers, by dropshippers.",
+            "copyright": "© 2026 Profit Simulator. All rights reserved."
+        }
+    }
+}
