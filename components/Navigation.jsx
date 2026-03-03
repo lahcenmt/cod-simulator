@@ -140,12 +140,7 @@ export default function Navigation() {
                                 >
                                     Sign In
                                 </Link>
-                                <Link
-                                    href="/signup"
-                                    className="px-4 py-2 bg-[#6366F1] hover:bg-[#4F46E5] text-white text-sm font-bold rounded-lg shadow-sm transition-all hover:shadow-md hover:scale-105"
-                                >
-                                    Get Started
-                                </Link>
+
                             </div>
                         )}
                     </div>
@@ -196,9 +191,7 @@ export default function Navigation() {
                             <Link href="/login" onClick={() => setIsMobileMenuOpen(false)} className="w-full py-3 border border-gray-200 text-gray-700 font-bold rounded-xl text-center">
                                 Sign In
                             </Link>
-                            <Link href="/signup" onClick={() => setIsMobileMenuOpen(false)} className="w-full py-3 bg-[#6366F1] text-white font-bold rounded-xl text-center">
-                                Create Account
-                            </Link>
+
                         </div>
                     )}
                 </div>

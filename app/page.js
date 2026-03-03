@@ -149,9 +149,7 @@ export default function Home() {
     );
   }
 
-  if (!currentUser) {
-    return <LandingPage />;
-  }
+
 
   // If authenticated, show dashboard
   return (

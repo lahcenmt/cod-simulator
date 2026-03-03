@@ -48,9 +48,7 @@ export default function LandingPage() {
                     </p>
 
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                        <Link href="/signup" className="px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white text-lg font-bold rounded-xl shadow-lg shadow-indigo-200 transition-all hover:-translate-y-1 hover:shadow-xl w-full sm:w-auto">
-                            {t('landing.hero.ctaPrimary')}
-                        </Link>
+
                         <Link href="/login" className="px-8 py-4 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-lg font-bold rounded-xl transition-all hover:border-indigo-300 w-full sm:w-auto flex items-center justify-center gap-2">
                             <LayoutDashboard size={20} /> {t('landing.hero.ctaSecondary')}
                         </Link>
@@ -147,9 +145,7 @@ export default function LandingPage() {
                                 ))}
                             </ul>
 
-                            <Link href="/signup" className="block w-full py-4 text-center bg-slate-700 hover:bg-slate-600 text-white font-bold rounded-xl transition-all">
-                                {t('landing.pricing.free.cta')}
-                            </Link>
+
                         </div>
 
                         {/* PRO PLAN */}
@@ -176,9 +172,7 @@ export default function LandingPage() {
                                 ))}
                             </ul>
 
-                            <Link href="/signup?plan=pro" className="block w-full py-4 text-center bg-indigo-500 hover:bg-indigo-400 text-white font-bold rounded-xl shadow-lg shadow-indigo-900/50 transition-all hover:shadow-indigo-500/25">
-                                {t('landing.pricing.pro.cta')}
-                            </Link>
+
                         </div>
 
                     </div>

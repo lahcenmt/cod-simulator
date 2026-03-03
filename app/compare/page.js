@@ -87,8 +87,6 @@ function ComparePageContent() {
 
 export default function ComparePage() {
     return (
-        <ProtectedRoute>
-            <ComparePageContent />
-        </ProtectedRoute>
+        <ComparePageContent />
     );
 }
