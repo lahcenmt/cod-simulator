@@ -26,7 +26,11 @@ export default function SignUp() {
             await signUp(email, password, displayName);
             router.push('/'); // Redirect to dashboard
         } catch (error) {
-            setError(error.message);
+            if (error.code === 'auth/email-already-in-use') {
+                setError('User already exists. Please sign in');
+            } else {
+                setError(error.message);
+            }
         } finally {
             setLoading(false);
         }

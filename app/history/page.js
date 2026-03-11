@@ -85,6 +85,8 @@ function HistoryPageContent() {
 
 export default function HistoryPage() {
     return (
-        <HistoryPageContent />
+        <ProtectedRoute>
+            <HistoryPageContent />
+        </ProtectedRoute>
     );
 }

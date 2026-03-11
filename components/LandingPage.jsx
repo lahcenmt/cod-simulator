@@ -48,9 +48,11 @@ export default function LandingPage() {
                     </p>
 
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-
+                        <Link href="/signup" className="px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white border border-transparent shadow-lg text-lg font-bold rounded-xl transition-all hover:-translate-y-0.5 w-full sm:w-auto flex items-center justify-center gap-2">
+                            <Zap size={20} className="fill-white" /> Get Started Free
+                        </Link>
                         <Link href="/login" className="px-8 py-4 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-lg font-bold rounded-xl transition-all hover:border-indigo-300 w-full sm:w-auto flex items-center justify-center gap-2">
-                            <LayoutDashboard size={20} /> {t('landing.hero.ctaSecondary')}
+                            <LayoutDashboard size={20} /> Sign In
                         </Link>
                     </div>
 

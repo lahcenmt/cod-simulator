@@ -5,8 +5,10 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 
 export default function BudgetPage() {
     return (
-        <div className="min-h-screen bg-slate-50 p-4 md:p-8">
-            <BudgetPlannerView />
-        </div>
+        <ProtectedRoute>
+            <div className="min-h-screen bg-slate-50 p-4 md:p-8">
+                <BudgetPlannerView />
+            </div>
+        </ProtectedRoute>
     );
 }

@@ -151,6 +151,10 @@ export default function Home() {
 
 
 
+  if (!currentUser) {
+    return <LandingPage />;
+  }
+
   // If authenticated, show dashboard
   return (
     <div className="min-h-screen bg-[#F8F9FB] font-sans pb-32 lg:pb-12">

@@ -22,7 +22,7 @@ export default function SignIn() {
             await signIn(email, password);
             router.push('/');
         } catch (error) {
-            setError('Failed to sign in. Check your credentials.');
+            setError('Email or password is incorrect');
         } finally {
             setLoading(false);
         }

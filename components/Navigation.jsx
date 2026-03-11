@@ -63,7 +63,7 @@ export default function Navigation() {
 
                     {/* CENTER: Navigation Links (Desktop) */}
                     <nav className="hidden md:flex items-center h-full">
-                        {routes.map((route) => (
+                        {currentUser && routes.map((route) => (
                             <Link
                                 key={route.path}
                                 href={route.path}
@@ -140,7 +140,12 @@ export default function Navigation() {
                                 >
                                     Sign In
                                 </Link>
-
+                                <Link
+                                    href="/signup"
+                                    className="px-4 py-2 text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl transition-colors shadow-sm"
+                                >
+                                    Sign Up
+                                </Link>
                             </div>
                         )}
                     </div>
@@ -160,7 +165,7 @@ export default function Navigation() {
             {/* Mobile Menu Dropdown */}
             {isMobileMenuOpen && (
                 <div className="md:hidden bg-white border-t border-gray-100 shadow-xl absolute top-16 left-0 right-0 p-4 flex flex-col gap-2">
-                    {routes.map((route) => (
+                    {currentUser && routes.map((route) => (
                         <Link
                             key={route.path}
                             href={route.path}
@@ -188,10 +193,12 @@ export default function Navigation() {
                         </button>
                     ) : (
                         <div className="flex flex-col gap-2">
+                            <Link href="/signup" onClick={() => setIsMobileMenuOpen(false)} className="w-full py-3 bg-indigo-600 text-white font-bold rounded-xl text-center shadow-lg">
+                                Sign Up
+                            </Link>
                             <Link href="/login" onClick={() => setIsMobileMenuOpen(false)} className="w-full py-3 border border-gray-200 text-gray-700 font-bold rounded-xl text-center">
                                 Sign In
                             </Link>
-
                         </div>
                     )}
                 </div>

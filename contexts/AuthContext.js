@@ -25,14 +25,7 @@ export function AuthProvider({ children }) {
             setCurrentUser(user);
 
             if (user) {
-                try {
-                    // Fetch user profile from Firestore if it exists
-                    const profile = await getUserProfile(user.uid);
-                    setUserProfile(profile);
-                } catch (err) {
-                    console.error("Error fetching user profile:", err);
-                    setUserProfile(null);
-                }
+                setUserProfile(null);
             } else {
                 setUserProfile(null);
             }
