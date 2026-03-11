@@ -8,6 +8,8 @@ import {
     Clock, Package, Truck, Percent, AlertCircle, CheckCircle, Info, RefreshCw
 } from "lucide-react";
 import Link from "next/link";
+import { useAuth } from "@/contexts/AuthContext";
+import { saveBudgetPlan } from "@/lib/firebase";
 import { calculateCODBudget, calculateScenarios, calculateBreakEven } from "@/lib/moroccoBudgetCalc";
 import {
     Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
@@ -15,6 +17,9 @@ import {
 } from "recharts";
 
 export default function BudgetPlannerView() {
+    const { currentUser } = useAuth();
+    const [isSaving, setIsSaving] = useState(false);
+
     // --- STATE MANAGEMENT ---
 
     // 1. Budget & Duration
@@ -107,6 +112,34 @@ export default function BudgetPlannerView() {
 
     const formatCurrency = (val) => new Intl.NumberFormat('en-MA', { style: 'currency', currency: 'MAD', maximumFractionDigits: 0 }).format(val);
 
+    const handleSave = async () => {
+        if (!currentUser) return alert("Please sign in to save your budget plan.");
+        try {
+            setIsSaving(true);
+            const planData = {
+                name: `Budget Plan ${new Date().toLocaleDateString()}`,
+                totalBudget,
+                durationIndays,
+                productPrice,
+                productCost,
+                shippingCost,
+                confirmationRate,
+                deliveryRate,
+                fbPercent,
+                selectedStrategy,
+                weeklyBudgets,
+                results
+            };
+            await saveBudgetPlan(currentUser.uid, planData);
+            alert("Budget plan saved successfully!");
+        } catch (error) {
+            console.error(error);
+            alert("Failed to save budget plan.");
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
     // Chart Data
     const pacingData = [
         { day: 'Week 1', spend: weeklyBudgets.week1, label: 'Test' },
@@ -140,8 +173,17 @@ export default function BudgetPlannerView() {
                     <p className="text-slate-500 mt-1">Morocco-optimized ad spend planner for Facebook & TikTok</p>
                 </div>
                 <div className="flex gap-2">
-                    <button className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg hover:bg-slate-50 font-medium shadow-sm">
-                        <Save size={16} /> Save
+                    <button 
+                        onClick={handleSave} 
+                        disabled={isSaving}
+                        className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg hover:bg-slate-50 font-medium shadow-sm transition-colors"
+                    >
+                        {isSaving ? (
+                            <div className="w-4 h-4 border-2 border-indigo-500 border-t-transparent flex items-center justify-center rounded-full animate-spin"></div>
+                        ) : (
+                            <Save size={16} />
+                        )}
+                        {isSaving ? "Saving..." : "Save"}
                     </button>
                     <button className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-bold shadow-md shadow-indigo-100 transition-all">
                         <Zap size={16} /> Apply Plan

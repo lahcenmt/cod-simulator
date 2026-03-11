@@ -13,6 +13,8 @@ import { TrendingUp, LayoutDashboard, Calculator, Activity, ChevronRight, Downlo
 import { useAuth } from "@/contexts/AuthContext";
 import { saveSimulation as saveToCloud } from "@/lib/firebase";
 import { useDebouncedEffect, storage } from "@/lib/hooks";
+import { getCurrentState } from "@/lib/firebase";
+import { useAutoSave } from "@/hooks/useAutoSave";
 
 import LandingPage from "@/components/LandingPage";
 
@@ -26,6 +28,8 @@ export default function Home() {
   ]);
   const [activeScenarioId, setActiveScenarioId] = useState('baseline');
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const { debouncedSave, isSaving, lastSaved } = useAutoSave(1000);
+  const [cloudStateLoaded, setCloudStateLoaded] = useState(false);
 
   // Derived state
   const activeScenario = scenarios.find(s => s.id === activeScenarioId) || scenarios[0];
@@ -50,27 +54,63 @@ export default function Home() {
 
   const inputs = activeScenario.inputs || MARKETS["MA"].defaults;
 
-  // Load from localStorage on mount
+  // Load from Firebase / localStorage on mount
   useEffect(() => {
-    const saved = storage.get('codsim_scenarios');
-    if (saved && Array.isArray(saved) && saved.length > 0) {
-      try {
-        const hydratedScenarios = saved.map(s => ({
-          ...s,
-          inputs: { ...MARKETS[activeMarketId].defaults, ...s.inputs }
-        }));
-        setScenarios(hydratedScenarios);
-        setActiveScenarioId(hydratedScenarios[0].id);
-      } catch (e) {
-        console.error('Error loading scenarios:', e);
+    async function loadData() {
+      let loadedScenarios = null;
+
+      // 1. Try to load scenarios array from localStorage
+      const saved = storage.get('codsim_scenarios');
+      if (saved && Array.isArray(saved) && saved.length > 0) {
+        try {
+          loadedScenarios = saved.map(s => ({
+            ...s,
+            inputs: { ...MARKETS[activeMarketId].defaults, ...s.inputs }
+          }));
+        } catch (e) {
+          console.error('Error hydrating scenarios from LS:', e);
+        }
       }
+
+      // 2. Try to load current active state from Cloud
+      if (currentUser) {
+        try {
+          const cloudState = await getCurrentState(currentUser.uid);
+          if (cloudState) {
+            if (loadedScenarios) {
+              // Update the baseline/active scenario with cloud state
+              loadedScenarios[0].inputs = { ...loadedScenarios[0].inputs, ...cloudState };
+            } else {
+              loadedScenarios = [{ id: 'baseline', name: 'Baseline', inputs: { ...MARKETS[activeMarketId].defaults, ...cloudState }, isBaseline: true }];
+            }
+          }
+        } catch (e) { console.error('Error loading cloud state:', e); }
+      }
+
+      // 3. Fallback
+      if (!loadedScenarios) {
+         loadedScenarios = [{ id: 'baseline', name: 'Baseline', inputs: MARKETS[activeMarketId].defaults, isBaseline: true }];
+      }
+
+      setScenarios(loadedScenarios);
+      setActiveScenarioId(loadedScenarios[0].id);
+      setCloudStateLoaded(true);
     }
-  }, []); // Only run on mount
+    
+    if (!loading) loadData();
+  }, [currentUser, loading]);
 
   // Debounced save to localStorage (500ms delay)
   useDebouncedEffect(() => {
     storage.set('codsim_scenarios', scenarios);
   }, 500, [scenarios]);
+
+  // Debounced auto-save to Firebase
+  useEffect(() => {
+    if (cloudStateLoaded && currentUser) {
+      debouncedSave(inputs);
+    }
+  }, [inputs, cloudStateLoaded, currentUser, debouncedSave]);
 
   // Actions
   const updateScenario = (id, updates) => {
@@ -193,6 +233,14 @@ export default function Home() {
                 <p className="text-sm text-gray-500 mt-1">Real-time profitability engine for {activeMarket.name}.</p>
               </div>
               <div className="flex items-center gap-3">
+                {/* Auto-save indicator */}
+                <div className="hidden sm:flex items-center text-xs text-slate-500 mr-2">
+                  {isSaving ? (
+                    <span className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></div> Saving...</span>
+                  ) : lastSaved ? (
+                    <span className="text-emerald-600 flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-emerald-500"></div> Saved</span>
+                  ) : null}
+                </div>
                 <Link href="/compare">
                   <button className="flex items-center gap-2 px-4 py-2 bg-white hover:bg-gray-50 text-indigo-600 border border-indigo-200 rounded-xl text-sm font-bold transition-all hover:shadow-sm">
                     <ArrowRightLeft size={16} />

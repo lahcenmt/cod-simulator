@@ -5,25 +5,62 @@ import { useState, useEffect } from "react";
 import ComparisonView from "@/components/ComparisonView";
 import { MARKETS } from "@/lib/constants";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import { useAuth } from "@/contexts/AuthContext";
+import { db, getScenarios } from "@/lib/firebase";
+import { doc, setDoc, deleteDoc } from "firebase/firestore";
+import { useDebouncedEffect } from "@/lib/hooks";
 
 function ComparePageContent() {
-    // We re-use local storage scenarios
+    const { currentUser } = useAuth();
     const [scenarios, setScenarios] = useState([
         { id: 'baseline', name: 'Baseline', inputs: MARKETS["MA"].defaults, isBaseline: true }
     ]);
     const [activeMarketId, setActiveMarketId] = useState("MA");
+    const [cloudSynced, setCloudSynced] = useState(false);
 
     useEffect(() => {
-        const saved = localStorage.getItem('codsim_scenarios');
-        if (saved) {
-            try {
-                const parsed = JSON.parse(saved);
-                if (Array.isArray(parsed) && parsed.length > 0) {
-                    setScenarios(parsed);
+        async function load() {
+            if (currentUser) {
+                try {
+                    const cloudScenes = await getScenarios(currentUser.uid);
+                    if (cloudScenes && cloudScenes.length > 0) {
+                        setScenarios(cloudScenes);
+                        setCloudSynced(true);
+                        return;
+                    }
+                } catch (e) {
+                    console.error("Error loading cloud scenarios:", e);
                 }
-            } catch (e) { console.error(e); }
+            }
+            const saved = localStorage.getItem('codsim_scenarios');
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        setScenarios(parsed);
+                    }
+                } catch (e) { console.error(e); }
+            }
+            setCloudSynced(true);
         }
-    }, []);
+        load();
+    }, [currentUser]);
+
+    // Cloud Auto-Sync
+    useDebouncedEffect(() => {
+        if (!currentUser || !cloudSynced || scenarios.length === 0) return;
+        const syncToCloud = async () => {
+            try {
+                for (const s of scenarios) {
+                    await setDoc(doc(db, 'users', currentUser.uid, 'scenarios', s.id), {
+                        ...s,
+                        updatedAt: Date.now()
+                    }, { merge: true });
+                }
+            } catch (e) { console.error("Error syncing scenarios", e); }
+        };
+        syncToCloud();
+    }, 1500, [scenarios, currentUser, cloudSynced]);
 
     const updateScenario = (id, updates) => {
         const updated = scenarios.map(s => s.id === id ? { ...s, ...updates } : s);
@@ -44,11 +81,17 @@ function ComparePageContent() {
         localStorage.setItem('codsim_scenarios', JSON.stringify(updated));
     };
 
-    const deleteScenario = (id) => {
+    const deleteScenario = async (id) => {
         if (scenarios.length <= 1) return;
         const updated = scenarios.filter(s => s.id !== id);
         setScenarios(updated);
         localStorage.setItem('codsim_scenarios', JSON.stringify(updated));
+        
+        if (currentUser) {
+            try {
+                await deleteDoc(doc(db, 'users', currentUser.uid, 'scenarios', id));
+            } catch(e) { console.error(e); }
+        }
     };
 
     const duplicateScenario = (id) => {

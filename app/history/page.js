@@ -6,7 +6,7 @@ import HistoryDashboard from "@/components/HistoryDashboard";
 import { MARKETS } from "@/lib/constants";
 import { getHistory, deleteHistoryItem } from "@/lib/historyManager";
 import { useAuth } from "@/contexts/AuthContext";
-import { getSimulations, deleteSimulation } from "@/lib/firebase";
+import { getSimulations, deleteSimulation, saveCurrentState } from "@/lib/firebase";
 import ProtectedRoute from "@/components/ProtectedRoute";
 
 function HistoryPageContent() {
@@ -34,7 +34,7 @@ function HistoryPageContent() {
     const handleDelete = async (id) => {
         if (currentUser) {
             if (confirm('Delete this simulation from cloud?')) {
-                await deleteSimulation(id);
+                await deleteSimulation(currentUser.uid, id);
                 // Reload
                 const data = await getSimulations(currentUser.uid);
                 setHistory(data.map(d => ({ ...d, id: d.id, timestamp: d.createdAt?.seconds * 1000 || Date.now() })));
@@ -56,11 +56,17 @@ function HistoryPageContent() {
         // However, for now, let's just copy to clipboard or show a toast.
         // Or better, update the 'baseline' scenario in LS and redirect.
 
-        const scenarios = JSON.parse(localStorage.getItem('codsim_scenarios') || '[]');
-        if (scenarios.length > 0) {
-            scenarios[0].inputs = inputs;
-            localStorage.setItem('codsim_scenarios', JSON.stringify(scenarios));
-            window.location.href = '/';
+        if (currentUser) {
+            saveCurrentState(currentUser.uid, inputs).then(() => {
+                window.location.href = '/';
+            });
+        } else {
+            const scenarios = JSON.parse(localStorage.getItem('codsim_scenarios') || '[]');
+            if (scenarios.length > 0) {
+                scenarios[0].inputs = inputs;
+                localStorage.setItem('codsim_scenarios', JSON.stringify(scenarios));
+                window.location.href = '/';
+            }
         }
     };
 

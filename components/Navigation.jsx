@@ -185,12 +185,17 @@ export default function Navigation() {
                     <div className="h-px bg-gray-100 my-2" />
 
                     {currentUser ? (
-                        <button
-                            onClick={() => { handleSignOut(); setIsMobileMenuOpen(false); }}
-                            className="w-full py-3 bg-red-50 text-red-600 font-bold rounded-xl flex items-center justify-center gap-2"
-                        >
-                            <LogOut size={18} /> Sign Out
-                        </button>
+                        <div className="flex flex-col gap-2">
+                            <Link href="/profile" onClick={() => setIsMobileMenuOpen(false)} className="w-full py-3 bg-slate-50 border border-slate-100 font-bold rounded-xl flex items-center justify-center gap-2">
+                                <User size={18} /> Profile Settings
+                            </Link>
+                            <button
+                                onClick={() => { handleSignOut(); setIsMobileMenuOpen(false); }}
+                                className="w-full py-3 bg-red-50 text-red-600 font-bold rounded-xl flex items-center justify-center gap-2"
+                            >
+                                <LogOut size={18} /> Sign Out
+                            </button>
+                        </div>
                     ) : (
                         <div className="flex flex-col gap-2">
                             <Link href="/signup" onClick={() => setIsMobileMenuOpen(false)} className="w-full py-3 bg-indigo-600 text-white font-bold rounded-xl text-center shadow-lg">
