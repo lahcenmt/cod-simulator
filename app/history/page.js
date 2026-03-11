@@ -18,9 +18,22 @@ function HistoryPageContent() {
             if (currentUser) {
                 try {
                     const data = await getSimulations(currentUser.uid);
-                    // Map Firebase data to compatible format if needed
-                    // Firebase returns { id, ...data }, structure should align with HistoryDashboard expects
-                    setHistory(data.map(d => ({ ...d, id: d.id, timestamp: d.createdAt?.seconds * 1000 || Date.now() })));
+                    // Map Firebase Data to compatible format for HistoryDashboard
+                    setHistory(data.map(d => {
+                        const metrics = d.metrics || d.results || {};
+                        return {
+                            ...d,
+                            id: d.id,
+                            timestamp: d.updatedAt?.toMillis ? d.updatedAt.toMillis() : (d.createdAt?.seconds ? d.createdAt.seconds * 1000 : Date.now()),
+                            metrics: {
+                                profit: metrics.profit || 0,
+                                margin: metrics.margin || 0,
+                                cpl: metrics.cpl || d.inputs?.cpl || 0,
+                                leads: metrics.leads || d.inputs?.totalLeads || d.inputs?.leads || 0,
+                                revenue: metrics.revenue || 0
+                            }
+                        };
+                    }));
                 } catch (error) {
                     console.error("Error loading history:", error);
                 }
@@ -37,7 +50,21 @@ function HistoryPageContent() {
                 await deleteSimulation(currentUser.uid, id);
                 // Reload
                 const data = await getSimulations(currentUser.uid);
-                setHistory(data.map(d => ({ ...d, id: d.id, timestamp: d.createdAt?.seconds * 1000 || Date.now() })));
+                setHistory(data.map(d => {
+                    const metrics = d.metrics || d.results || {};
+                    return {
+                        ...d,
+                        id: d.id,
+                        timestamp: d.updatedAt?.toMillis ? d.updatedAt.toMillis() : (d.createdAt?.seconds ? d.createdAt.seconds * 1000 : Date.now()),
+                        metrics: {
+                            profit: metrics.profit || 0,
+                            margin: metrics.margin || 0,
+                            cpl: metrics.cpl || d.inputs?.cpl || 0,
+                            leads: metrics.leads || d.inputs?.totalLeads || d.inputs?.leads || 0,
+                            revenue: metrics.revenue || 0
+                        }
+                    };
+                }));
             }
         } else {
             const updated = deleteHistoryItem(id);
